@@ -2,11 +2,12 @@ from selenium import webdriver
 from selenium.webdriver import Chrome
 from webdriver_manager.chrome import ChromeDriverManager 
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
 import time
 
 def initialize_driver():
     # Configura el driver de Selenium
-    service = Service(ChromeDriverManager.install())
+    service = Service(ChromeDriverManager().install())
     option= webdriver.ChromeOptions()
     # option.add_argument("--headless")
     option.add_argument("windows-size=1920,1080")

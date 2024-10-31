@@ -3,13 +3,17 @@ from selenium.webdriver import Chrome
 from webdriver_manager.chrome import ChromeDriverManager 
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+
 import time
 
 def initialize_driver():
     # Configura el driver de Selenium
     service = Service(ChromeDriverManager().install())
     option= webdriver.ChromeOptions()
-    # option.add_argument("--headless")
+    option.add_argument("--no-sandbox")
+    option.add_argument("--disable-dev-shm-usage")
+    option.add_argument("--headless")  # Modo sin cabeza
+    option.add_argument("--disable-gpu")
     option.add_argument("windows-size=1920,1080")
     driver = Chrome(service=service, options=option)
 
@@ -21,32 +25,30 @@ def get_news_articles():
     driver = initialize_driver()
     
     # Visita la página de noticias
-    driver.get("https://elpais.com/america/economia/")
+    driver.get("https://www.forbes.com/news/")
     time.sleep(5)  # Espera para que la página cargue completamente
     
-    # Encuentra los artículos en la página
-    articles_elements = driver.find_elements(By.CSS_SELECTOR, "h2.c_t a")
+
+    articles_elements = driver.find_elements(By.CSS_SELECTOR, '._4g0BEaLU')
+    
 
     # Extrae los datos de cada artículo
     news_data = []
+
     for article in articles_elements:
         try:
-            title = article.text
-            url = article.get_attribute("href")
+            title = article.find_element(By.CSS_SELECTOR, '._1-FLFW4R') 
+            date = article.find_element(By.CSS_SELECTOR, '.IE8ecQMQ')
+            description = article.find_element(By.CSS_SELECTOR, '.Ccg9Ib-7')
 
-            # Extraer la fecha usando el siguiente selector CSS
-            date_element = driver.find_element(By.CSS_SELECTOR, "span.c_a_t time#sc_date")
-            date = date_element.text
-            
-            # Extraer la descripción (puedes cambiar el selector si necesitas más contexto)
-            description_element = driver.find_element(By.CSS_SELECTOR, "p.c_d")
-            description = description_element.text
-            
+            # print("TITLE ARTICLE", title.text)
+            print("DESCRIPTION ARTICLE", description.text)
+            # print(article.get_attribute('outerHTML'))
+
             news_data.append({
-                "title": title,
-                "date": date,
-                "description": description,
-                "url": url
+                "title": title.text,
+                "date": date.text,
+                "description": description.text,
             })
         except Exception as e:
             print(f"Error al procesar el artículo: {e}")
